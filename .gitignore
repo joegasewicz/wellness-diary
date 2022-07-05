@@ -1,0 +1,5 @@
+.idea
+gui/.idea
+gui_client/.idea
+gui_client/cmake-build-debug
+gui_client/gui
