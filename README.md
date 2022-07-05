@@ -1,7 +1,2 @@
 # Wellness Diary
-
-### Stack
-- gui 
-  - GTK4
-- api_one
-  - Gomek / Go
+Open source (GPL2) project to track physical ailments
