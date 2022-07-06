@@ -10,11 +10,6 @@
 GtkWidget *activity_detail_txt;
 GtkWidget *symptom_txt;
 
-static const char *DAY_COUNT[][20] = {
-    "01.00",
-    "02.00",
-
-};
 
 static void get_day_count(char *hours[24])
 {
@@ -27,12 +22,12 @@ static void get_day_count(char *hours[24])
     }
 }
 
-static void create_list_box_day_times(GtkListBox *list_box, char *hours[24])
+static void create_list_store_day_times(GtkListStore *list_store, char *hours[24])
 {
     for (int i = 1; i < 24; i++)
     {
-        GtkWidget *list_row_item_one_lbl = gtk_label_new(hours[i]);
-        gtk_list_box_insert(list_box, list_row_item_one_lbl, i);
+        gtk_list_store_insert_with_values(list_store, NULL, i, 0,
+                                          hours[i], 1, "text...", -1);
     }
 
 }
@@ -66,25 +61,27 @@ int main(int argc, char *argv[])
 
     // Widgets
     GtkWidget *quit_btn = gtk_button_new_with_label("Quit");
-    GtkWidget *add_activity_lbl = gtk_label_new("Add Activity");
-    GtkWidget *main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     GtkWidget *main_table = gtk_table_new(2, 2 ,TRUE);
-    GtkWidget *left_table = gtk_table_new(5, 5, TRUE);
+    GtkWidget *left_table = gtk_table_new(2, 2, TRUE);
     GtkWidget *right_table = gtk_table_new(5, 5, TRUE);
-    GtkWidget *day_list_box = gtk_list_box_new();
-    GtkWidget *list_row_item_one = gtk_list_box_row_new();
-    GtkWidget *main_separator = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
+    GtkListStore *day_list_store = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
+    GtkWidget *day_tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(day_list_store));
+
     // Entries
     activity_detail_txt = gtk_entry_new();
     symptom_txt = gtk_entry_new();
-    // Listbox
+    // Day hours list
     get_day_count(list_box_hours);
-    create_list_box_day_times(GTK_LIST_BOX(day_list_box), list_box_hours);
+    create_list_store_day_times(GTK_LIST_STORE(day_list_store), list_box_hours);
+    GtkCellRenderer *day_text_rend = gtk_cell_renderer_text_new();
+    gtk_tree_view_insert_column_with_attributes(
+            GTK_TREE_VIEW(day_tree), -1, "Today", day_text_rend, "text", 0, NULL);
+
     // Table
-    gtk_table_attach_defaults(GTK_TABLE(left_table), day_list_box, 0, 5, 0, 1);
-    gtk_table_attach_defaults(GTK_TABLE(right_table), activity_detail_txt, 0, 5, 0, 1);
-    gtk_table_attach_defaults(GTK_TABLE(main_table), left_table, 0, 1, 0, 1);
-    gtk_table_attach_defaults(GTK_TABLE(main_table), right_table, 1, 2, 0, 1);
+    gtk_table_attach_defaults(GTK_TABLE(left_table), day_tree, 0, 2, 0, 2);
+    gtk_table_attach_defaults(GTK_TABLE(right_table), activity_detail_txt, 0, 5, 0, 5);
+    gtk_table_attach_defaults(GTK_TABLE(main_table), left_table, 0, 1, 0, 2);
+    gtk_table_attach_defaults(GTK_TABLE(main_table), right_table, 1, 2, 0, 2);
     // Containers
     gtk_container_add(GTK_CONTAINER(win), main_table);
     // Signals
