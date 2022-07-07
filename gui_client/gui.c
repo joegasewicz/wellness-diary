@@ -14,17 +14,16 @@
 GtkWidget *activity_detail_txt;
 GtkWidget *symptom_txt;
 
-static void create_list_store_day_times(GtkListStore *list_store, char *hours[24])
+static void WA_create_list_store_day_times(GtkListStore *list_store, char *hours[24])
 {
     for (int i = 1; i < 24; i++)
     {
         gtk_list_store_insert_with_values(list_store, NULL, i, 0,
                                           hours[i], 1, "text", -1);
     }
-
 }
 
-void end_program(GtkWidget *wid, gpointer ptr)
+void WA_end_program(GtkWidget *wid, gpointer ptr)
 {
     GC_LOGGER("User exiting app.");
     gtk_main_quit();
@@ -64,7 +63,7 @@ int main(int argc, char *argv[])
     symptom_txt = gtk_entry_new();
     // Day hours list
     WD_get_day_count(list_box_hours);
-    create_list_store_day_times(GTK_LIST_STORE(day_list_store), list_box_hours);
+    WA_create_list_store_day_times(GTK_LIST_STORE(day_list_store), list_box_hours);
     GtkCellRenderer *day_text_rend = gtk_cell_renderer_text_new();
     gtk_tree_view_insert_column_with_attributes(
             GTK_TREE_VIEW(day_tree), -1, "Today", day_text_rend, "text", 0, NULL);
@@ -77,8 +76,8 @@ int main(int argc, char *argv[])
     // Containers
     gtk_container_add(GTK_CONTAINER(win), main_table);
     // Signals
-    g_signal_connect(quit_btn, "clicked", G_CALLBACK(end_program), NULL);
-    g_signal_connect(win, "delete_event", G_CALLBACK(end_program), NULL);
+    g_signal_connect(quit_btn, "clicked", G_CALLBACK(WA_end_program), NULL);
+    g_signal_connect(win, "delete_event", G_CALLBACK(WA_end_program), NULL);
 
     gtk_widget_show_all(win);
 
