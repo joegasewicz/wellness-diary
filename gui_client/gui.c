@@ -1,6 +1,10 @@
+// Wellness Diary Prototype GUI tool. Copyright 2022.
+// Usage subject to the GPL2 license conditions.
+// All public functions prefixed with 'WA_'
 #include <stdio.h>
 #include <gtk/gtk.h>
 #include <string.h>
+#include "utils.h"
 
 #define DEBUG 1
 #define GC_LOGGER(msg) if (DEBUG) printf("%s\n", msg);
@@ -10,24 +14,12 @@
 GtkWidget *activity_detail_txt;
 GtkWidget *symptom_txt;
 
-
-static void get_day_count(char *hours[24])
-{
-    for (int i = 1; i < 24; i++)
-    {
-        char time[6];
-        sprintf(time, "%i:00", i);
-        hours[i] = malloc(sizeof(time));
-        strcpy(hours[i] ,time);
-    }
-}
-
 static void create_list_store_day_times(GtkListStore *list_store, char *hours[24])
 {
     for (int i = 1; i < 24; i++)
     {
         gtk_list_store_insert_with_values(list_store, NULL, i, 0,
-                                          hours[i], 1, "text...", -1);
+                                          hours[i], 1, "text", -1);
     }
 
 }
@@ -71,13 +63,13 @@ int main(int argc, char *argv[])
     activity_detail_txt = gtk_entry_new();
     symptom_txt = gtk_entry_new();
     // Day hours list
-    get_day_count(list_box_hours);
+    WD_get_day_count(list_box_hours);
     create_list_store_day_times(GTK_LIST_STORE(day_list_store), list_box_hours);
     GtkCellRenderer *day_text_rend = gtk_cell_renderer_text_new();
     gtk_tree_view_insert_column_with_attributes(
             GTK_TREE_VIEW(day_tree), -1, "Today", day_text_rend, "text", 0, NULL);
-
-    // Table
+    // ====================================================================================
+    // Layout
     gtk_table_attach_defaults(GTK_TABLE(left_table), day_tree, 0, 2, 0, 2);
     gtk_table_attach_defaults(GTK_TABLE(right_table), activity_detail_txt, 0, 5, 0, 5);
     gtk_table_attach_defaults(GTK_TABLE(main_table), left_table, 0, 1, 0, 2);
