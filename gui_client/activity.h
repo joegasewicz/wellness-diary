@@ -13,9 +13,16 @@ typedef struct ActivityType {
     char *name;
 } WA_ActivityType;
 
+typedef struct ActivityDetail {
+    uint8_t id;
+    char *name;
+    uint8_t activity_id;
+} WA_ActivityDetail;
+
 typedef struct Activity {
     char *day_hours[24];
     WA_ActivityType *types[7];
+    WA_ActivityDetail *details[];
 } WA_Activity;
 
 WA_Activity *WA_activity_new(char *hours[24]);

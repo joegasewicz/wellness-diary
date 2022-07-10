@@ -7,6 +7,7 @@
 #include "utils.h"
 #include "activity.h"
 #include "symptom.h"
+#include "/Users/joegeezer/CLionProjects/json-store/libjson_store.h"
 
 #define DEBUG 1
 #define GC_LOGGER(msg) if (DEBUG) printf("%s\n", msg);
@@ -44,6 +45,7 @@ void add_activity()
 
 int main(int argc, char *argv[])
 {
+    json_store_new();
     GC_LOGGER("Starting gui");
 
     char *list_box_hours[24];
@@ -94,6 +96,8 @@ int main(int argc, char *argv[])
     /** combo_select_activity_type */
     WA_set_combo_select_activity(activity, GTK_COMBO_BOX_TEXT(combo_select_activity_type));
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo_select_activity_type), 0);
+    /** combo_select_activity_detail */
+
     // Signals --------------
     g_signal_connect(win, "delete_event", G_CALLBACK(WA_end_program), NULL);
     // Left table --------------
@@ -104,7 +108,9 @@ int main(int argc, char *argv[])
     gtk_table_attach_defaults(GTK_TABLE(right_table), combo_select_time, 0, 1, 2, 3);
     gtk_table_attach_defaults(GTK_TABLE(right_table), select_type_activity_lb, 0, 1, 3, 4);
     gtk_table_attach_defaults(GTK_TABLE(right_table), combo_select_activity_type, 0, 1, 4, 5);
+    gtk_table_attach_defaults(GTK_TABLE(right_table), activity_add_btn, 0, 1, 5, 6);
 
+    gtk_table_attach_defaults(GTK_TABLE(right_table), add_symptom_sub_heading_lb, 0, 1, 6, 7);
     // Main table --------------
     gtk_table_attach_defaults(GTK_TABLE(main_table), left_table, 0, 1, 0, 2);
     gtk_table_attach_defaults(GTK_TABLE(main_table), right_table, 1, 2, 0, 2);
