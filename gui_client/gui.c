@@ -1,6 +1,15 @@
 // Wellness Diary Prototype GUI tool. Copyright 2022.
 // Usage subject to the GPL2 license conditions.
 // All public functions prefixed with 'WA_'
+//
+// Data:
+//      - activity:
+//          - The `activity` variable stores in memory the app's WA_Activity current state.
+//          - This includes the user created WA_ActivityDetail objects.
+//      - symptoms
+//          - TODO...
+//
+//
 #include <stdio.h>
 #include <gtk/gtk.h>
 #include <string.h>
@@ -34,7 +43,6 @@ void WA_end_program(GtkWidget *wid, gpointer ptr)
 
 gboolean WA_add_activity_detail(GtkWidget *wid, gpointer data)
 {
-    printf("here 1 -----> %s\n", activity_detail_txt);
     return TRUE;
 }
 
@@ -58,7 +66,6 @@ int main(int argc, char *argv[])
     json_store_new();
     GC_LOGGER("Starting gui");
     char *list_box_hours[24];
-    WA_ActivityDetail *activity_details_callback_data[] = {};
     WA_Activity *activity;
     WD_get_day_count(list_box_hours);
     activity = WA_activity_new(list_box_hours);
@@ -109,7 +116,7 @@ int main(int argc, char *argv[])
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo_select_activity_for_detail), 0);
     // Signals -------------------------------
     g_signal_connect(win, "delete_event", G_CALLBACK(WA_end_program), NULL);
-    g_signal_connect(win, "notify::visible", G_CALLBACK(WA_get_input), activity_details_callback_data);
+    g_signal_connect(win, "notify::visible", G_CALLBACK(WA_get_input), activity);
     g_signal_connect(win, "clicked", G_CALLBACK(WA_add_activity_detail), NULL);
     // Left table ----------------------------
     gtk_table_attach_defaults(GTK_TABLE(left_table), day_tree, 0, 2, 0, 2);
