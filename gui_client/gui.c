@@ -7,15 +7,15 @@
 #include "utils.h"
 #include "activity.h"
 #include "symptom.h"
-#include "/Users/joegeezer/CLionProjects/json-store/libjson_store.h"
+#include "/home/joe/CLionProjects/libjson_store/libjson_store.h"
 
 #define DEBUG 1
 #define GC_LOGGER(msg) if (DEBUG) printf("%s\n", msg);
 #define GC_WINDOW_WIDTH 1004
 #define GC_WINDOW_HEIGHT 558
 
-const static GtkWidget *activity_detail_txt;
-const static GtkWidget *symptom_txt;
+static GtkWidget *activity_detail_txt;
+static GtkWidget *symptom_txt;
 
 static void WA_create_list_store_day_times(GtkListStore *list_store, char *hours[24])
 {
@@ -32,15 +32,25 @@ void WA_end_program(GtkWidget *wid, gpointer ptr)
     gtk_main_quit();
 }
 
-void add_activity()
+gboolean WA_add_activity_detail(GtkWidget *wid, gpointer data)
 {
-    GC_LOGGER("Adding activity");
+    printf("here 1 -----> %s\n", activity_detail_txt);
+    return TRUE;
 }
 
-void WA_get_input(GtkWidget *wid, gpointer ptr)
+gboolean WA_get_input(GtkWidget *wid, gpointer user_data)
 {
-    const char *input = gtk_entry_get_text(GTK_ENTRY(activity_detail_txt));
-    gtk_label_set_text(GTK_LABEL(ptr), input);
+    char *name = gtk_entry_get_text(GTK_ENTRY(activity_detail_txt));
+    if (strcmp(name, "") > 0)
+    {
+        WA_Activity *a = (WA_Activity*)user_data;
+        WA_ActivityDetail *ad = malloc(sizeof(WA_ActivityDetail));
+        ad->name = name;
+        ad->activity_id = 1;
+        a->details[3] = ad; // TODO get size of array before setting
+    }
+
+    return TRUE;
 }
 
 int main(int argc, char *argv[])
@@ -48,6 +58,7 @@ int main(int argc, char *argv[])
     json_store_new();
     GC_LOGGER("Starting gui");
     char *list_box_hours[24];
+    WA_ActivityDetail *activity_details_callback_data[] = {};
     WA_Activity *activity;
     WD_get_day_count(list_box_hours);
     activity = WA_activity_new(list_box_hours);
@@ -98,7 +109,8 @@ int main(int argc, char *argv[])
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo_select_activity_for_detail), 0);
     // Signals -------------------------------
     g_signal_connect(win, "delete_event", G_CALLBACK(WA_end_program), NULL);
-    g_signal_connect(win, "clicked", G_CALLBACK(WA_get_input), NULL);
+    g_signal_connect(win, "notify::visible", G_CALLBACK(WA_get_input), activity_details_callback_data);
+    g_signal_connect(win, "clicked", G_CALLBACK(WA_add_activity_detail), NULL);
     // Left table ----------------------------
     gtk_table_attach_defaults(GTK_TABLE(left_table), day_tree, 0, 2, 0, 2);
     // Right table ---------------------------

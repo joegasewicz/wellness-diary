@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.22)
 project(gui_client C)
 
 # libraries
-add_library(json_store STATIC /Users/joegeezer/CLionProjects/json-store/libjson_store.c)
-target_include_directories(json_store PUBLIC /Users/joegeezer/CLionProjects/json-store)
+add_library(json_store STATIC /home/joe/CLionProjects/libjson_store/libjson_store.c)
+target_include_directories(json_store PUBLIC /home/joe/CLionProjects/libjson_store)
 
 set(CMAKE_C_STANDARD 11)
 find_package(PkgConfig REQUIRED)
@@ -17,11 +17,11 @@ add_executable(gui_client
         activity.c activity.h
         utils.c utils.h mental.c
         mental.h
-        /Users/joegeezer/CLionProjects/json-store/libjson_store.c
-        /Users/joegeezer/CLionProjects/json-store/libjson_store.h
+        /home/joe/CLionProjects/libjson_store/libjson_store.c
+        /home/joe/CLionProjects/libjson_store/libjson_store.h
         )
 
 target_link_libraries(gui_client PUBLIC
         ${GTK3_LIBRARIES}
-        /Users/joegeezer/CLionProjects/json-store
+        /home/joe/CLionProjects/libjson_store
         )
