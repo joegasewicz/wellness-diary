@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 project(gui_client C)
 
 # libraries
-add_library(json_store STATIC libs/libjson_store/libjson_store.c)
+add_library(json_store STATIC /Users/joegeezer/CLionProjects/json-store/libjson_store.c)
 target_include_directories(json_store PUBLIC /Users/joegeezer/CLionProjects/json-store)
 
 set(CMAKE_C_STANDARD 11)

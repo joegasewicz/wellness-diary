@@ -14,8 +14,8 @@
 #define GC_WINDOW_WIDTH 1004
 #define GC_WINDOW_HEIGHT 558
 
-GtkWidget *activity_detail_txt;
-GtkWidget *symptom_txt;
+const static GtkWidget *activity_detail_txt;
+const static GtkWidget *symptom_txt;
 
 static void WA_create_list_store_day_times(GtkListStore *list_store, char *hours[24])
 {
@@ -32,33 +32,27 @@ void WA_end_program(GtkWidget *wid, gpointer ptr)
     gtk_main_quit();
 }
 
-void get_input(GtkWidget *wid, gpointer ptr, GtkWidget *txt)
-{
-    const char *input = gtk_entry_get_text(GTK_ENTRY(txt));
-    gtk_label_set_text(GTK_LABEL(ptr), input);
-}
-
 void add_activity()
 {
     GC_LOGGER("Adding activity");
+}
+
+void WA_get_input(GtkWidget *wid, gpointer ptr)
+{
+    const char *input = gtk_entry_get_text(GTK_ENTRY(activity_detail_txt));
+    gtk_label_set_text(GTK_LABEL(ptr), input);
 }
 
 int main(int argc, char *argv[])
 {
     json_store_new();
     GC_LOGGER("Starting gui");
-
     char *list_box_hours[24];
     WA_Activity *activity;
-
     WD_get_day_count(list_box_hours);
     activity = WA_activity_new(list_box_hours);
-
-    // Init --------------
     gtk_init(&argc, &argv);
-    // Window --------------
     GtkWidget *win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    // Widgets --------------
     GtkWidget *main_table = gtk_table_new(2, 2 ,TRUE);
     GtkWidget *left_table = gtk_table_new(2, 2, TRUE);
     GtkWidget *right_table = gtk_table_new(9, 2, TRUE);
@@ -66,6 +60,8 @@ int main(int argc, char *argv[])
     GtkWidget *day_tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(day_list_store));
     GtkWidget *activity_sub_heading_lb = gtk_label_new("Add new activity to Monday");
     GtkWidget *activity_detail_sub_heading_lb = gtk_label_new("Create a new activity detail");
+    GtkWidget *activity_detail_select_activity_lb = gtk_label_new("Select activity");
+    GtkWidget *activity_detail_text_lb = gtk_label_new("Activity detail");
     GtkWidget *add_symptom_sub_heading_lb = gtk_label_new("Add Symptom");
     GtkWidget *create_new_symptom_sub_heading_lb = gtk_label_new("Create a new symptom");
     GtkWidget *select_time_lbl = gtk_label_new("Select time");
@@ -73,7 +69,7 @@ int main(int argc, char *argv[])
     GtkWidget *combo_select_time = gtk_combo_box_text_new();
     GtkWidget *combo_select_activity_type = gtk_combo_box_text_new();
     GtkWidget *combo_select_activity_detail = gtk_combo_box_text_new();
-    GtkWidget *combo_select_activity = gtk_combo_box_text_new();
+    GtkWidget *combo_select_activity_for_detail = gtk_combo_box_text_new();
     GtkWidget *combo_select_symptom = gtk_combo_box_text_new();
     GtkWidget *diary_next_btn = gtk_button_new_with_label("Next");
     GtkWidget *diary_prev_btn = gtk_button_new_with_label("Previous");
@@ -84,12 +80,12 @@ int main(int argc, char *argv[])
     // Entries --------------
     activity_detail_txt = gtk_entry_new();
     symptom_txt = gtk_entry_new();
-    // Day hours list --------------
+    // Day hours list -----------------------
     WA_create_list_store_day_times(GTK_LIST_STORE(day_list_store), list_box_hours);
     GtkCellRenderer *day_text_rend = gtk_cell_renderer_text_new();
     gtk_tree_view_insert_column_with_attributes(
             GTK_TREE_VIEW(day_tree), -1, "Today", day_text_rend, "text", 0, NULL);
-    // Combos ----------------
+    // Combos -------------------------------
     /** combo_select_time */
     WA_set_combo_select_time(activity, GTK_COMBO_BOX_TEXT(combo_select_time));
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo_select_time), 0);
@@ -97,31 +93,43 @@ int main(int argc, char *argv[])
     WA_set_combo_select_activity(activity, GTK_COMBO_BOX_TEXT(combo_select_activity_type));
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo_select_activity_type), 0);
     /** combo_select_activity_detail */
-
-    // Signals --------------
+    /** combo_select_activity_for_detail */
+    WA_set_combo_select_activity(activity, GTK_COMBO_BOX_TEXT(combo_select_activity_for_detail));
+    gtk_combo_box_set_active(GTK_COMBO_BOX(combo_select_activity_for_detail), 0);
+    // Signals -------------------------------
     g_signal_connect(win, "delete_event", G_CALLBACK(WA_end_program), NULL);
-    // Left table --------------
+    g_signal_connect(win, "clicked", G_CALLBACK(WA_get_input), NULL);
+    // Left table ----------------------------
     gtk_table_attach_defaults(GTK_TABLE(left_table), day_tree, 0, 2, 0, 2);
-    // Right table --------------
+    // Right table ---------------------------
+    /** Left column */
     gtk_table_attach_defaults(GTK_TABLE(right_table), activity_sub_heading_lb, 0, 1, 0, 1);
     gtk_table_attach_defaults(GTK_TABLE(right_table), select_time_lbl, 0, 1, 1, 2);
     gtk_table_attach_defaults(GTK_TABLE(right_table), combo_select_time, 0, 1, 2, 3);
     gtk_table_attach_defaults(GTK_TABLE(right_table), select_type_activity_lb, 0, 1, 3, 4);
     gtk_table_attach_defaults(GTK_TABLE(right_table), combo_select_activity_type, 0, 1, 4, 5);
     gtk_table_attach_defaults(GTK_TABLE(right_table), activity_add_btn, 0, 1, 5, 6);
-
+    /** Bottom left column */
     gtk_table_attach_defaults(GTK_TABLE(right_table), add_symptom_sub_heading_lb, 0, 1, 6, 7);
-    // Main table --------------
+    /** Right column */
+    gtk_table_attach_defaults(GTK_TABLE(right_table), activity_detail_sub_heading_lb, 1, 2, 0, 1);
+    gtk_table_attach_defaults(GTK_TABLE(right_table), activity_detail_select_activity_lb, 1, 2, 1, 2);
+    gtk_table_attach_defaults(GTK_TABLE(right_table), combo_select_activity_for_detail, 1, 2, 2, 3);
+    gtk_table_attach_defaults(GTK_TABLE(right_table), activity_detail_text_lb, 1, 2, 3, 4);
+    gtk_table_attach_defaults(GTK_TABLE(right_table), activity_detail_txt, 1, 2, 4, 5);
+    gtk_table_attach_defaults(GTK_TABLE(right_table), activity_detail_btn, 1, 2, 5, 6);
+    /** Bottom right column */
+    // Main table ---------------------------
     gtk_table_attach_defaults(GTK_TABLE(main_table), left_table, 0, 1, 0, 2);
     gtk_table_attach_defaults(GTK_TABLE(main_table), right_table, 1, 2, 0, 2);
-    // Containers --------------
+    // Containers ---------------------------
     gtk_container_add(GTK_CONTAINER(win), main_table);
-    // Window work --------------
+    // Window work --------------------------
     gtk_widget_show_all(win);
     gtk_window_resize(win, GC_WINDOW_WIDTH, GC_WINDOW_HEIGHT);
-    // Start main --------------
+    // Start main --------------------------
     gtk_main();
-    // Cleanup --------------
+    // Cleanup -----------------------------
     free(*list_box_hours);
     free(activity);
     return 0;

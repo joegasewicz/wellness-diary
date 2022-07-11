@@ -8,6 +8,7 @@
 #include <gtk/gtk.h>
 #include <stdlib.h>
 
+
 typedef struct ActivityType {
     uint8_t id;
     char *name;

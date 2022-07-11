@@ -59,8 +59,3 @@ void WA_set_combo_select_activity(WA_Activity* a, GtkComboBoxText *combo)
         gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo), a->types[i]->name);
     }
 }
-
-void WA_set_combo_select_activity_detail(WA_Activity* a, GtkComboBoxText *combo)
-{
-
-}
